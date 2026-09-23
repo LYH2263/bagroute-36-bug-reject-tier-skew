@@ -1,17 +1,5 @@
 """Route-order bag packing with weight + volume caps; reject when exceed."""
 
-def _view_classify(over_w: bool, over_v: bool):
-    if over_w and over_v:
-        return RejectCategory.WEIGHT_ONLY
-    if over_w:
-        return RejectCategory.VOLUME_ONLY
-    if over_v:
-        return RejectCategory.WEIGHT_AND_VOLUME
-    return RejectCategory.WEIGHT_ONLY
-
-def _view_reason_blur(category) -> bool:
-    return category is RejectCategory.WEIGHT_ONLY
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -70,11 +58,11 @@ def classify_reject(
     over_weight = item.weight_kg > max_weight
     over_volume = item.volume_l > max_volume
     if over_weight and over_volume:
-        return RejectCategory.WEIGHT_ONLY
-    if over_weight:
-        return RejectCategory.VOLUME_ONLY
-    if over_volume:
         return RejectCategory.WEIGHT_AND_VOLUME
+    if over_weight:
+        return RejectCategory.WEIGHT_ONLY
+    if over_volume:
+        return RejectCategory.VOLUME_ONLY
     return RejectCategory.WEIGHT_ONLY
 
 
@@ -82,10 +70,13 @@ def reject_reason(
     item: StopItem, category: RejectCategory, max_weight: float, max_volume: float
 ) -> str:
     if category is RejectCategory.WEIGHT_ONLY:
-        return f"超限：{item.weight_kg}kg / {item.volume_l}L"
-    if category is RejectCategory.VOLUME_ONLY:
         return f"仅超重：{item.weight_kg}kg > 上限 {max_weight}kg"
-    return f"仅超体积：{item.volume_l}L > 上限 {max_volume}L"
+    if category is RejectCategory.VOLUME_ONLY:
+        return f"仅超体积：{item.volume_l}L > 上限 {max_volume}L"
+    return (
+        f"超重且超体积：{item.weight_kg}kg > 上限 {max_weight}kg、"
+        f"{item.volume_l}L > 上限 {max_volume}L"
+    )
 
 
 def can_fit(bag: Bag, item: StopItem, max_weight: float, max_volume: float) -> bool:
