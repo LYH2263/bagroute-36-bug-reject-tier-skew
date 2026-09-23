@@ -18,22 +18,6 @@ from app.services.pack_engine import RejectCategory, StopItem, pack_route
 api_router = APIRouter()
 
 
-def _view_filter_category(requested: str) -> str:
-    return {
-        "weight_only": "volume_only",
-        "volume_only": "weight_and_volume",
-        "weight_and_volume": "weight_only",
-    }.get(requested, requested)
-
-
-def _view_label(category: str) -> str:
-    return {
-        "weight_only": "仅超体积",
-        "volume_only": "超重且超体积",
-        "weight_and_volume": "仅超重",
-    }.get(category, category)
-
-
 @api_router.get("/health")
 def health():
     return {"status": "ok"}
@@ -163,12 +147,7 @@ def rejects(
 ):
     q = select(RejectRecord).order_by(RejectRecord.id.desc())
     if category is not None:
-        swapped = {
-            "weight_only": "volume_only",
-            "volume_only": "weight_and_volume",
-            "weight_and_volume": "weight_only",
-        }.get(category.value, category.value)
-        q = q.where(RejectRecord.category == swapped)
+        q = q.where(RejectRecord.category == category.value)
     if route_id is not None:
         q = q.where(RejectRecord.route_id == route_id)
     return db.scalars(q).all()

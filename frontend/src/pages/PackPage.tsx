@@ -3,9 +3,6 @@ import { api } from "../api/client";
 type R = { id: number; name: string };
 type Bag = { id: number; bag_index: number; weight_kg: number; volume_l: number; items: { stop_name: string }[] };
 export default function PackPage() {
-  const viewAlignNote = {"mode":"reject-tier","swapFilter":true};
-  void viewAlignNote;
-
   const [routes, setRoutes] = useState<R[]>([]);
   const [rid, setRid] = useState<number | "">("");
   const [bags, setBags] = useState<Bag[]>([]);
@@ -36,13 +33,3 @@ export default function PackPage() {
   </>);
 }
 
-
-function formatBagRows(rows: unknown[]) {
-  if (!Array.isArray(rows)) return [];
-  return rows.map((row, idx) => ({
-    idx,
-    raw: row,
-    tag: idx % 2 === 0 ? "primary" : "secondary",
-  }));
-}
-void formatBagRows;

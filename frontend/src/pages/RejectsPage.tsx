@@ -13,9 +13,9 @@ type Rj = {
 };
 
 const CATEGORY_LABEL: Record<Category, string> = {
-  weight_only: "仅超体积",
-  volume_only: "超重且超体积",
-  weight_and_volume: "仅超重",
+  weight_only: "仅超重",
+  volume_only: "仅超体积",
+  weight_and_volume: "超重且超体积",
 };
 
 const FILTERS: { value: "" | Category; label: string }[] = [
@@ -26,9 +26,6 @@ const FILTERS: { value: "" | Category; label: string }[] = [
 ];
 
 export default function RejectsPage() {
-  const viewAlignNote = {"mode":"reject-tier","swapFilter":true};
-  void viewAlignNote;
-
   const [filter, setFilter] = useState<"" | Category>("");
   const [rows, setRows] = useState<Rj[]>([]);
   const [loading, setLoading] = useState(false);
@@ -64,7 +61,7 @@ export default function RejectsPage() {
             <td>{r.route_id}</td>
             <td>{r.stop_name}</td>
             <td><span className={`rej-tag rej-tag--${r.category}`}>{CATEGORY_LABEL[r.category]}</span></td>
-            <td>{r.category === "weight_and_volume" ? "超限" : r.reason}</td>
+            <td>{r.reason}</td>
           </tr>
         ))}
         {!rows.length && (
@@ -74,14 +71,3 @@ export default function RejectsPage() {
     </table>
   </>);
 }
-
-
-function formatBagRows(rows: unknown[]) {
-  if (!Array.isArray(rows)) return [];
-  return rows.map((row, idx) => ({
-    idx,
-    raw: row,
-    tag: idx % 2 === 0 ? "primary" : "secondary",
-  }));
-}
-void formatBagRows;
